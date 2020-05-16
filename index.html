@@ -1,0 +1,908 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+    <title>BommaFit_streetview</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta charset="utf-8" />
+    <meta name="description" content="Virtually ride indoors with Google Street View and bluetooth bike speed or cadence sensor" />
+    <meta property="og:title" content="Bommafit_streetview" />
+    <meta property="og:description" content="Virtually ride indoors with Google Street View and bluetooth bike speed or cadence sensor.  Indoor bike riding with Google Maps and BLE bike speed or cadence sensor." />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+    <link rel="stylesheet" href="./css/odometer.css" />
+    <link href="https://fonts.googleapis.com/css?family=Lato:900" rel="stylesheet" />
+    <style>
+
+        /* Center the waitring */
+        #waitring {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        z-index: 1;
+        width: 150px;
+        height: 150px;
+        margin: -75px 0 0 -75px;
+        border: 16px solid #f3f3f3;
+        border-radius: 50%;
+        border-top: 16px solid #3498db;
+        width: 120px;
+        height: 120px;
+        -webkit-animation: spin 2s linear infinite;
+        animation: spin 2s linear infinite;
+        }
+
+        @-webkit-keyframes spin {
+        0% { -webkit-transform: rotate(0deg); }
+        100% { -webkit-transform: rotate(360deg); }
+        }
+
+        @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+        }
+
+        #street-view, #map-view, #app-container {
+        height: 100%;
+        }
+        <!--#ui-left-container {
+        position: absolute;
+        top: 0.3vw;
+        left: 0.3vw;
+        height: 10.7vw;
+        width: 18vw;
+        z-index: 150;
+        padding: 0;
+        font-family: 'Lato',sans-serif;
+        font-weight: 900;
+        line-height: initial;
+        }
+        #ui-left {
+        height: 100%;
+        width: 100%;
+        position: relative;
+        overflow: hidden;
+        background-color: #31A3CC;
+        border-top-right-radius: 2vw;
+        border-bottom-left-radius: 2vw;
+        border-top-left-radius: 0.3vw;
+        border-bottom-right-radius: 0.3vw;
+        }
+
+        <!--#watts-unit {
+        float: right;
+        font-size: 2.5vw;
+        padding-right: 0.7vw;
+        padding-left: 0.35vw;
+        margin-top: 1.9vw;
+        color: #fff;
+        line-height: 2vw;
+        text-align:center;
+        }
+        #watts-unit i {
+        font-size: 1.9vw;
+        }
+        #watts {
+        padding-top: 0.5vw;
+        padding-left: 0;
+        text-align: right;
+        color: #fff;
+        font-size: 6.3vw;
+        line-height: 6.1vw;
+        }-->
+
+        #heart-unit {
+        float: right;
+        font-size: 1.2vw;
+        padding-right: 0.7vw;
+        padding-left: 0.3vw;
+        margin-top: 1.2vw;
+        color: #000;
+        line-height: 0.7vw;
+        text-align: center;
+        }
+        #heart-unit i {
+        font-size: 1vw;
+        }
+        #heart {
+        padding-left: 0;
+        padding-bottom: 0.6vw;
+        padding-top: 0.4vw;
+        text-align: right;
+        color: #000;
+        font-size: 2.6vw;
+        }
+
+        #cadence-container {
+        position: absolute;
+        top: 6.5vw;
+        left: 0;
+        width: 9vw;
+        }
+
+        #cadence-unit {
+        float: right;
+        font-size: 1.2vw;
+        padding-right: 0.7vw;
+        padding-left: 0.3vw;
+        margin-top: 1.2vw;
+        color: #000;
+        line-height: 0.7vw;
+        text-align:center;
+        }
+        #cadence-unit i {
+        font-size: 1vw;
+        }
+        #cadence {
+        padding-left: 0;
+        padding-bottom: 0.6vw;
+        padding-top: 0.4vw;
+        text-align: right;
+        color: #000;
+        font-size: 2.6vw;
+        }-->
+
+        #ui-center-container {
+        position: absolute;
+        top: 0.3vw;
+        left: 0;
+        right: 0;
+        margin-left: auto;
+        margin-right: auto;
+        height: 5vw;
+        width: 48.75vw;
+        z-index: 150;
+        padding: 0;
+        font-family: 'Lato',sans-serif;
+        font-weight: 900;
+        line-height: initial;
+        }
+
+        #ui-center {
+        height: 100%;
+        width: 100%;
+        position: relative;
+        overflow: hidden;
+        background-color: #fff;
+        border-top-right-radius: 1vw;
+        border-bottom-left-radius: 1vw;
+        border-top-left-radius: 0.3vw;
+        border-bottom-right-radius: 0.3vw;
+        }
+
+        #speed-container {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 10.5vw;
+        }
+
+        #speed-unit {
+        float: right;
+        font-size: 1.3vw;
+        padding-right: 0.7vw;
+        padding-left: 0.1vw;
+        margin-top: 1.75vw;
+        color: #31A3CC;
+        line-height: 1.15vw;
+        text-align:center;
+        }
+
+        #speed-unit i {
+        font-size: 1.2vw;
+        }
+        #speed {
+        padding-left: 0;
+        padding-bottom: 0.5vw;
+        padding-top: 0.11vw;
+        text-align: right;
+        color: #31A3CC;
+        font-size: 4vw;
+        }
+
+        #distance-container {
+        position: absolute;
+        top: 0;
+        left: 19vw;
+        width: 10.75vw;
+        }
+
+        #distance-unit {
+        float: right;
+        font-size: 1.3vw;
+        padding-right: 0.7vw;
+        padding-left: 0.1vw;
+        margin-top: 1.55vw;
+        color: #000;
+        line-height: 1.3vw;
+        text-align:center;
+        }
+
+        #distance-unit i {
+        font-size: 1.1vw;
+        }
+
+        #distance {
+        padding-left: 0;
+        padding-bottom: 0.5vw;
+        padding-top: 0.11vw;
+        text-align: right;
+        color: #000;
+        font-size: 4vw;
+        }
+
+        #watts-container {
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 15.75vw;
+        }
+
+        #watts-unit {
+        float: right;
+        font-size: 1.3vw;
+        padding-right: 0.7vw;
+        padding-left: 0.1vw;
+        margin-top: 1.75vw;
+        color: #31A3CC;
+        line-height: 1.15vw;
+        text-align:center;
+        }
+
+        #watts-unit i {
+        font-size: 1.2vw;
+        }
+
+        #watts {
+        padding-left: 0;
+        padding-bottom: 0.5vw;
+        padding-top: 0.11vw;
+        text-align: right;
+        color: #31A3CC;
+        font-size: 4vw;
+        }
+
+        #climb-container {
+        position: absolute;
+        top: 0;
+        left: 21.25vw;
+        width: 11.75vw;
+        }
+
+        #climb-unit {
+        float: right;
+        font-size: 1.3vw;
+        padding-right: 0.7vw;
+        padding-left: 0.1vw;
+        margin-top: 1.7vw;
+        color: #31A3CC;
+        line-height: 1.2vw;
+        text-align:center;
+        }
+
+        #climb-unit i {
+        font-size: 1.2vw;
+        }
+
+        #climb {
+        padding-left: 0;
+        padding-bottom: 0.5vw;
+        padding-top: 0.11vw;
+        text-align: right;
+        color: #31A3CC;
+        font-size: 4vw;
+        }
+
+        #time-container {
+        position: absolute;
+        top: 0;
+        left: 33vw;
+        width: 15.9vw;
+        }
+
+        #time-unit {
+        float: right;
+        font-size: 1.3vw;
+        padding-right: 0.7vw;
+        padding-left: 0.1vw;
+        margin-top: 2.1vw;
+        color: #000;
+        line-height: 0.7vw;
+        text-align:center;
+        }
+
+        #time-unit i {
+        font-size: 1.2vw;
+        }
+
+        #time {
+        padding-left: 0;
+        padding-bottom: 0.5vw;
+        padding-top: 0.11vw;
+        text-align: right;
+        color: #000;
+        font-size: 4vw;
+        }
+
+        #tracker-container {
+        position: absolute;
+        top: 0.3vw;
+        right: 0.3vw;
+        height: 12vw;
+        width: 22vw;
+        z-index: 150;
+        padding: 0;
+        color: #fff;
+        }
+
+        #tracker {
+        height: 100%;
+        width: 100%;
+        position: relative;
+        overflow: hidden;
+        }
+
+        #ui-elevation-container {
+        position: absolute;
+        top: 13vw;
+        right: 0.3vw;
+        height: 6vw;
+        width: 15vw;
+        z-index: 150;
+        padding: 0;
+        font-family: 'Lato',sans-serif;
+        font-weight: 900;
+        color: #fff;
+        line-height: initial;
+        }
+
+        #ui-elevation {
+        height: 100%;
+        width: 100%;
+        position: relative;
+        overflow: hidden;
+        }
+
+        #ui-elevation-svg {
+        height: 100%;
+        width: 100%;
+        }
+
+        #ui-elevation-grade {
+        position: absolute;
+        top: 3.7vw;
+        left: 0.75vw;
+        width: 10vw;
+        }
+
+        #grade-unit {
+        float: right;
+        font-size: 1vw;
+        padding-right: 0.7vw;
+        padding-left: 0.1vw;
+        margin-top: 0.25vw;
+        color: #fff;
+        line-height: 1vw;
+        text-align:center;
+        }
+
+        #grade-unit i {
+        font-size: 0.7vw;
+        }
+        #grade {
+        text-align: right;
+        color: #fff;
+        font-size: 2.1vw;
+        }
+
+        #ui-heightmap-container {
+        position: absolute;
+        top: 19.3vw;
+        right: 0.3vw;
+        height: 3.75vw;
+        width: 15vw;
+        z-index: 150;
+        padding: 0;
+        font-family: 'Lato',sans-serif;
+        font-weight: 900;
+        color: #fff;
+        line-height: initial;
+        }
+
+        #ui-heightmap {
+        height: 100%;
+        width: 100%;
+        position: relative;
+        overflow: hidden;
+        }
+
+        #ui-heightmap-svg {
+        height: 100%;
+        width: 100%;
+        }
+
+        #ui-vpower-container {
+        position: absolute;
+        top: 11.3vw;
+        left: 0.3vw;
+        height: 5vw;
+        width: 14vw;
+        z-index: 150;
+        padding: 0;
+        font-family: 'Lato',sans-serif;
+        font-weight: 900;
+        line-height: initial;
+        color: #000;
+        }
+
+        #ui-vpower {
+        height: 100%;
+        width: 100%;
+        position: relative;
+        overflow: hidden;
+        background-color: #fff;
+        border-top-right-radius: 1vw;
+        border-bottom-left-radius: 1vw;
+        border-top-left-radius: 0.3vw;
+        border-bottom-right-radius: 0.3vw;
+        padding: 1vw;
+        padding-top: 1.1vw;
+        }
+
+        #ui-vpower-label {
+        font-size: 1vw;
+        text-align: center;
+        }
+
+        #vpower {
+        width: 100%
+        }
+
+        #ui-menuopen-container {
+        position: absolute;
+        top: 0.2vw;
+        left: 0.2vw;
+        height: 6vw;
+        width: 6vw;
+        z-index: 150;
+        padding: 0;
+        font-family: 'Lato',sans-serif;
+        font-weight: 900;
+        line-height: initial;
+        }
+
+        #ui-menuopen {
+        height: 100%;
+        width: 100%;
+        position: relative;
+        overflow: hidden;
+        background-color: #31A3CC;
+        border-top-right-radius: 1vw;
+        border-bottom-left-radius: 1vw;
+        border-top-left-radius: 0.3vw;
+        border-bottom-right-radius: 0.3vw;
+        }
+
+        #menuopen {
+        padding-left: 1.1vw;
+        padding-top: 0.1vw;
+        color: #fff;
+        font-size: 4.5vw;
+        }
+
+        #menuopen-btn {
+        color: #fff;
+        }
+
+        #ui-finalize-container {
+        position: absolute;
+        top: 11.3vw;
+        left: 30vw;
+        /*height: 12vw;*/
+        width: 28vw;
+        z-index: 150;
+        padding: 0;
+        font-family: 'Lato',sans-serif;
+        font-weight: 900;
+        line-height: initial;
+        color: #000;
+        }
+
+        #ui-finalize {
+        height: 100%;
+        width: 100%;
+        position: relative;
+        overflow: hidden;
+        background-color: #fff;
+        border-top-right-radius: 1vw;
+        border-bottom-left-radius: 1vw;
+        border-top-left-radius: 0.3vw;
+        border-bottom-right-radius: 0.3vw;
+        padding: 1vw;
+        padding-top: 1.5vw;
+        }
+
+        #ui-finalize-label {
+        font-size: 2vw;
+        text-align: center;
+        }
+
+        #ui-finalize-actions {
+        margin-top: 0.4vw;
+        text-align: center;
+        }
+
+        #input-ride-name {
+        margin-bottom: 0.4vw;
+        text-align: center;
+        font-size: 1.2vw;
+        padding: .5vw .75vw;
+        }
+
+        #btn-export-strava {
+        background-color: #fa632e;
+        border-color: #e0430b;
+        font-size: 1.5vw;
+        margin-bottom: 0.4vw;
+        padding: .5vw .75vw;
+        }
+
+        #btn-fullscreen {
+        background-color: #fa632e;
+        border-color: #e0430b;
+        font-size: 1.5vw;
+        padding: .5vw .75vw;
+        }
+
+        #street-view, #map-view {
+        z-index: 90;
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 100%;
+        }
+
+        #rider-weight {
+        width: 20vw;
+        }
+
+        html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        }
+
+    </style>
+</head>
+<body>
+    <div id="app-container" style="display: none">
+        <div id="ui-left-container" style="display: none">
+            <div id="ui-left">
+                <!--<div id="watts-unit">
+                    <i class="fa fa-bolt" aria-hidden="true"></i><br />
+                    w
+                </div>
+                <div id="watts">0</div>-->
+                <!--// tonen van de hartslag niet zichtbaar gemaakt in het google streetview scherm-->
+                <div id="heart-unit" style="display: none">
+                    <i class="fa fa-heartbeat" aria-hidden="true"></i><br />
+                    bpm
+                </div>
+                <div id="heart" style="display: none">--</div>
+                <!--// tonen van de cadans niet zichtbaar gemaakt in het google streetview scherm-->
+                <div id="cadence-container">
+                    <div id="cadence-unit">
+                        <i class="fa fa-circle-o-notch" aria-hidden="true"></i><br />
+                        rpm
+                    </div>
+                    <div id="cadence">--</div>
+                </div>
+            </div>
+        </div>
+        <div id="ui-center-container">
+            <div id="ui-center">
+                <div id="speed-container">
+                    <div id="speed-unit">
+                        <i class="fa fa-tachometer" aria-hidden="true"></i>
+                        <br />
+                        <span id="speed-unit-value">mph</span>
+                    </div>
+                    <div id="speed">0</div>
+                </div>
+                <div id="distance-container">
+                    <div id="distance-unit">
+                        <i class="icon-odometer"></i>
+                        <br />
+                        <span id="distance-unit-value">mi</span>
+                    </div>
+                    <div id="distance">0</div>
+                </div>
+                <div id="watts-container">
+                    <div id="watts-unit">
+                        <i class="fa fa-bolt" aria-hidden="true"></i>
+                        <br />
+                        <span id="watts-unit-value">Watt</span>
+                    </div>
+                    <div id="watts">0</div>
+                </div>
+                <div id="climb-container" style="display: none">
+                    <div id="climb-unit">
+                        <i class="fa fa-area-chart" aria-hidden="true"></i><br />
+                        <span id="climb-container-value">ft</span>
+                    </div>
+                    <div id="climb">0</div>
+                </div>
+                <div id="time-container" style="display: none">
+                    <div id="time-unit">
+                        <i class="fa fa-clock-o" aria-hidden="true"></i><br />
+                        et
+                    </div>
+                    <div id="time" style="display: none">00:00</div>
+                </div><!--fa fa-bars-->
+            </div>
+        </div>
+        <div id="tracker-container">
+            <div id="tracker"></div>
+        </div>
+
+        <div id="ui-elevation-container" style="display: none">
+            <div id="ui-elevation">
+            </div>
+            <div id="ui-elevation-grade">
+                <div id="grade-unit">
+                    <i id="grade-unit-icon" class="fa fa-long-arrow-up" aria-hidden="true"></i><br />
+                    %
+                </div>
+                <div id="grade">0</div>
+            </div>
+        </div>
+        <div id="ui-heightmap-container" style="display: none">
+            <div id="ui-heightmap">
+            </div>
+        </div>
+        <div id="ui-vpower-container" style="display: none">
+            <div id="ui-vpower">
+                <div id="ui-vpower-label">
+                    Virtual Power
+                </div>
+                <input id="vpower" type="range" min="0" max="900" step="any" />
+            </div>
+        </div>
+        <!--// knop menu heb ik niet nodig vandaar display op none (niet meer zichtbaar)-->
+        <div id="ui-menuopen-container" style="display: none">
+            <div id="ui-menuopen">
+                <div id="menuopen">
+                    <a href="#" id="menuopen-btn"><i class="fa fa-bars" aria-hidden="true"></i></a>
+                </div>
+            </div>
+        </div>
+        <div id="ui-finalize-container" style="display: none">
+            <div id="ui-finalize">
+                <div id="ui-finalize-label">
+                    Ride Finished
+                </div>
+                <div id="ui-finalize-actions">
+                    <input id="input-ride-name" class="form-control" type="text" style="display: none" placeholder="Name Ride" />
+                    <a href="#" id="btn-export-strava" class="btn btn-secondary active" role="button" aria-pressed="true" style="display: none">Export to Strava</a>
+                    <!--//de knop fullscreen is verandert naar de functie reload page, dit als je de route heb gefietst terug een nieuwe rit kan laden-->
+                    <a href="#" id="btn-fullscreen" class="btn btn-secondary active" role="button" aria-pressed="true" style="display: block">New ride?</a>
+                </div>
+            </div>
+        </div>
+        <div id="street-view"></div>
+        <div id="map-view" style="display: none"></div>
+    </div>
+    <div id="configure-container" class="container">
+        <h1>BommaFit Streetview</h1>
+        <p class="lead">
+            Virtually ride indoors with Google Street View and bluetooth bike speed or cadence sensor.
+            <br />
+            If you use a speed bluetooth low energy sensor, the bicycle speed determines the power.
+            <br />
+            If you use a cadence sensor, the power is fixed at 50 watts. A cadence ble sensor is ideal
+            <br />
+            for seniors with a home trainer where speed is not important and usually mounting the
+            <br />
+            sensor can only be done on the crank of the pedal.
+        </p>
+
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <div class="alert alert-danger" role="alert" id="messages" style="display: none;">
+
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <form>
+                        <div class="form-row">
+                            <div class="form-group col-md-9">
+                                <label for="gpx-file-upload">GPX Route</label>
+                                <!-- Nav tabs -->
+                                <ul id="route-nav" class="nav nav-tabs" role="tablist">
+                                    <li class="nav-item">
+                                        <a class="nav-link active" data-toggle="tab" href="#upload" role="tab">Upload</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" data-toggle="tab" href="#continue" role="tab">Resume Ride</a>
+                                    </li>
+                                </ul>
+
+                                <!-- Tab panes -->
+                                <div class="tab-content">
+                                    <div class="tab-pane active" id="upload" role="tabpanel">
+                                        <br />
+                                        <input type="file" class="form-control-file" accept=".gpx" id="gpx-file-upload" />
+                                        <p class="small" style="margin: 0">
+                                            <!--GPX Route files can be created for free with <a href="https://www.komoot.com/" target="_blank">Komoot</a> or <a href="https://ridewithgps.com/" target="_blank">Ride with GPS</a>.  A sample gpx route can be downloaded <a href="./routes/washington_dc.gpx">here</a>.-->
+                                            How do i create a ride in google maps and save it to your computer in GPX format, <a href="https://youtu.be/PT7YXoDBemM" target="_blank">Link youtube.</a>
+                                            <br />
+                                            A sample gpx route can be downloaded <a href="https://bommasoft.blob.core.windows.net/bommasoft/test-ride.gpx">here</a>.
+                                            <br />
+                                            Beware not every road of the world is yet on Google Street View, if not the map is displayed.
+                                        </p>
+                                    </div>
+                                    <div class="tab-pane" id="continue" role="tabpanel">
+                                        <br />
+                                        <select class="custom-select" id="continue-previous">
+                                            <option value="" selected=selected>Select One</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-row" style="display: none">
+                            <div class="form-group col-md-6">
+                                <label for="display-unit" class="col-form-label">Display Unit</label> <br />
+                                <select class="custom-select" id="display-unit">
+                                    <option value="metric">Metric</option>
+                                    <option value="imperial">Imperial</option>
+                                </select>
+                            </div>
+                        </div>
+                        <!--//nemen default gewicht = 66 Kg dwz niet meer zelf te kiezen, zie bundle.js ==> f.value = 66,-->
+                        <div class="form-row" style="display: none">
+                            <div class="form-group col-md-6">
+                                <label for="rider-weight" id="rider-weight-label" class="col-form-label">Rider Weight (kg)</label>
+                                <input type="text" class="form-control" id="rider-weight" placeholder="85" />
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div id="bluetooth-device-container" class="form-group col-md-9">
+                                <label for="btn-bluetooth-device" class="col-form-label">Bluetooth Devices</label>
+                                <br />
+                                <a id="btn-bluetooth-device" class="btn btn-primary" href="#" role="button">
+                                    <i class="fa fa-bluetooth" aria-hidden="true"></i>
+                                    <span id="btn-bluetooth-device-txt">Connect</span>
+                                </a>
+                                <p id="btn-bluetooth-device-warning" class="small" style="display: none">
+                                    Web Bluetooth API not supported in this browser. 
+                                    <br />
+                                    Please use the latest version of Google Chrome or Microsoft Edge.<br /><br />
+                                </p>
+                                <br />
+                                <span class="small" style="display: none">
+                                    <a href=".?useant=true">Switch to Ant+ Sensors</a>
+                                </span>
+                            </div>
+                            <div id="ant-device-container" class="form-group col-md-9" style="display: none">
+                                <label for="btn-ant-device" class="col-form-label">Ant Devices</label>
+                                <br />
+                                <a id="btn-ant-device" class="btn btn-warning" href="#" role="button">
+                                    <i class="fa fa-wifi" aria-hidden="true"></i>
+                                    <span id="btn-ant-device-txt">Scan</span>
+                                </a>
+                                <input type="text" id="ant-ws-url" class="form-control" placeholder="ANT-WS server address" style="display: inline; width: 300px" />
+                                <span id="btn-ant-device-error" class="small" style="color: red; display:none">
+                                </span>
+                                <br />
+                                <span id="btn-ant-device-warning" class="small" style="">
+                                    Download and run the <a href="https://github.com/chadj/ant-ws" target="_blank">ANT-WS</a> server locally to relay ANT+ messages over websockets<br />
+                                    <a href=".">Switch to BLE Sensors</a>
+                                </span>
+                            </div>
+                        </div>
+                        <!--// keuze power sensor bd gezet, dwz niet zichtbaar in het formulier-->
+                        <div class="form-row" style="display: none">
+                            <div class="form-group col-md-6">
+                                <label for="power-meter" class="col-form-label">Power Meter</label><br />
+                                <select class="custom-select" id="power-meter">
+                                    <!--<option value="virtual" selected=selected>Virtual Power Meter</option>-->
+                                    <!--<option value="cycleopsmagnetopowercurve">Cycleops Magneto Power Curve</option>-->
+                                    <option value="virtual">Virtual Power Meter</option>
+                                    <option value="cycleopsmagnetopowercurve" selected=selected>Cycleops Magneto Power Curve</option>
+                                </select>
+                            </div>
+                        </div>
+                        <!--// keuze hartslag sensor bd gezet, dwz niet zichtbaar in het formulier-->
+                        <div class="form-row" style="display: none">
+                            <div class="form-group col-md-6">
+                                <label for="hr-meter" class="col-form-label">Heart Rate Monitor</label><br />
+                                <select class="custom-select" id="hr-meter">
+                                    <option value="" selected=selected>Disabled</option>
+                                </select>
+                            </div>
+                        </div>
+                        <!--// keuze cadence sensor bd gezet, dwz niet zichtbaar in het formulier-->
+                        <div class="form-row" style="display: none">
+                            <div class="form-group col-md-6">
+                                <label for="cadence-meter" class="col-form-label">Cadence Meter</label><br />
+                                <select class="custom-select" id="cadence-meter">
+                                    <option value="" selected=selected>Disabled</option>
+                                </select>
+                            </div>
+                        </div>
+                        <!--// strava container bd gezet, dwz niet zichtbaar in het formulier-->
+                        <div class="form-row" id="container-strava" style="display: none">
+                            <div class="form-group col-md-6">
+                                <label class="col-form-label">Connections</label>
+                                <div class="container">
+                                    <div class="row">
+                                        <div class="col-4" style="padding-left: 0; padding-right: 0">
+                                            <img src="./images/strava.png" id="strava-connection" style="width: 100%; margin-top: 5px" />
+                                        </div>
+                                        <div class="col-6">
+                                            <a href="#" id="strava-btn-connect" class="btn btn-secondary active" role="button" aria-pressed="true">Connect</a>
+                                            <a href="#" id="strava-btn-connected" class="btn btn-success disabled" style="display: none" role="button" aria-pressed="true">Connected</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <button style="background:red;" disabled type="submit" id="begin-session" class="btn btn-primary">Begin</button>
+                        <div style="display:none;" id="waitring"></div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <footer class="footer mt-3">
+            <!--bd gezet door style="display: none" toe te voegen-->
+            <div class="container" style="display: none">
+                <span class="small text-muted">Indoor bike riding with Google Maps and BLE bike speed or cadence sensor.</span><br />
+                <span class="small text-muted">BommaFit streetview is open source and hosted on <a href="https://github.com/">Github</a>.  Contributions are welcome.  <a href="https://github.com/">https://github.com/</a> </span><br />
+                <span class="small text-muted">Send questions or comments to <a href="mailto:">naxans@gmail.com</a></span><br />
+            </div>
+        </footer>
+
+    </div>
+
+    <script id="strava-gpx-template" type="x-tmpl-mustache">
+        <?xml version="1.0" encoding="UTF-8" ?>
+        <gpx creator="GPedalGPX" version="1.1" xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd http://www.garmin.com/xmlschemas/GpxExtensions/v3 http://www.garmin.com/xmlschemas/GpxExtensionsv3.xsd http://www.garmin.com/xmlschemas/TrackPointExtension/v1 http://www.garmin.com/xmlschemas/TrackPointExtensionv1.xsd http://www.garmin.com/xmlschemas/GpxExtensions/v3 http://www.garmin.com/xmlschemas/GpxExtensionsv3.xsd http://www.garmin.com/xmlschemas/TrackPointExtension/v1 http://www.garmin.com/xmlschemas/TrackPointExtensionv1.xsd" xmlns:gpxtpx="http://www.garmin.com/xmlschemas/TrackPointExtension/v1" xmlns:gpxx="http://www.garmin.com/xmlschemas/GpxExtensions/v3">
+            <metadata>
+                <time>{{ export_time }}</time>
+            </metadata>
+            <trk>
+                <name>{{ export_name }}</name>
+                <trkseg>
+                    {{#points}}
+                    <trkpt lat="{{ lat }}" lon="{{ lng }}">
+                        <ele>{{ elevation }}</ele>
+                        <time>{{ time }}</time>
+                        <extensions>
+                            <power>{{ power }}</power>
+                            <gpxtpx:TrackPointExtension>
+                                {{#hr}}
+                                <gpxtpx:hr>{{ hr }}</gpxtpx:hr>
+                                {{/hr}}
+                                {{#cad}}
+                                <gpxtpx:cad>{{ cad }}</gpxtpx:cad>
+                                {{/cad}}
+                            </gpxtpx:TrackPointExtension>
+                        </extensions>
+                    </trkpt>
+                    {{/points}}
+                </trkseg>
+            </trk>
+        </gpx>
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD8CBYhq7f2aibteBvLz2jvRZAHu346qJM&libraries=geometry">
+    </script>
+    <!--publish key = AIzaSyCAaPv-EB14exrrWjKO3RDzUpFLYqjnlvg-->
+    <script src="bundle.js">
+    </script>
+</body>
+</html>
