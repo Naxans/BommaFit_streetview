@@ -3,4 +3,4 @@ Virtually cycling for seniors with Google Street View and bluetooth low energy (
 
 Try it out [https://naxans.github.io/BommaFit_streetview/](https://naxans.github.io/BommaFit_streetview/)
 
-Source https://github.com/chadj/gpedal
+BommaFit_streetview is based on gpedal
