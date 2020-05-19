@@ -44,7 +44,7 @@
         #street-view, #map-view, #app-container {
         height: 100%;
         }
-      
+
 
         #ui-center-container {
         position: absolute;
@@ -166,7 +166,7 @@
         font-size: 4vw;
         }
 
-       
+
 
         #tracker-container {
         position: absolute;
@@ -186,7 +186,121 @@
         overflow: hidden;
         }
 
-       
+        #ui-elevation-container {
+        position: absolute;
+        top: 13vw;
+        right: 0.3vw;
+        height: 6vw;
+        width: 15vw;
+        z-index: 150;
+        padding: 0;
+        font-family: 'Lato',sans-serif;
+        font-weight: 900;
+        color: #fff;
+        line-height: initial;
+        }
+
+        #ui-elevation {
+        height: 100%;
+        width: 100%;
+        position: relative;
+        overflow: hidden;
+        }
+
+        #ui-elevation-svg {
+        height: 100%;
+        width: 100%;
+        }
+
+        #ui-elevation-grade {
+        position: absolute;
+        top: 3.7vw;
+        left: 0.75vw;
+        width: 10vw;
+        }
+
+        #grade-unit {
+        float: right;
+        font-size: 1vw;
+        padding-right: 0.7vw;
+        padding-left: 0.1vw;
+        margin-top: 0.25vw;
+        color: #fff;
+        line-height: 1vw;
+        text-align:center;
+        }
+
+        #grade-unit i {
+        font-size: 0.7vw;
+        }
+        #grade {
+        text-align: right;
+        color: #fff;
+        font-size: 2.1vw;
+        }
+
+        #ui-heightmap-container {
+        position: absolute;
+        top: 19.3vw;
+        right: 0.3vw;
+        height: 3.75vw;
+        width: 15vw;
+        z-index: 150;
+        padding: 0;
+        font-family: 'Lato',sans-serif;
+        font-weight: 900;
+        color: #fff;
+        line-height: initial;
+        }
+
+        #ui-heightmap {
+        height: 100%;
+        width: 100%;
+        position: relative;
+        overflow: hidden;
+        }
+
+        #ui-heightmap-svg {
+        height: 100%;
+        width: 100%;
+        }
+
+        #ui-vpower-container {
+        position: absolute;
+        top: 11.3vw;
+        left: 0.3vw;
+        height: 5vw;
+        width: 14vw;
+        z-index: 150;
+        padding: 0;
+        font-family: 'Lato',sans-serif;
+        font-weight: 900;
+        line-height: initial;
+        color: #000;
+        }
+
+        #ui-vpower {
+        height: 100%;
+        width: 100%;
+        position: relative;
+        overflow: hidden;
+        background-color: #fff;
+        border-top-right-radius: 1vw;
+        border-bottom-left-radius: 1vw;
+        border-top-left-radius: 0.3vw;
+        border-bottom-right-radius: 0.3vw;
+        padding: 1vw;
+        padding-top: 1.1vw;
+        }
+
+        #ui-vpower-label {
+        font-size: 1vw;
+        text-align: center;
+        }
+
+        #vpower {
+        width: 100%
+        }
 
         #ui-menuopen-container {
         position: absolute;
@@ -376,7 +490,7 @@
             <div id="tracker"></div>
         </div>
 
-        <div id="ui-elevation-container" style="display: none">
+        <div id="ui-elevation-container"  style="display: none">
             <div id="ui-elevation">
             </div>
             <div id="ui-elevation-grade">
@@ -387,7 +501,7 @@
                 <div id="grade">0</div>
             </div>
         </div>
-        <div id="ui-heightmap-container" style="display: none">
+        <div id="ui-heightmap-container"  style="display: none">
             <div id="ui-heightmap">
             </div>
         </div>
@@ -630,7 +744,7 @@
             </trk>
         </gpx>
     </script>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCAaPv-EB14exrrWjKO3RDzUpFLYqjnlvg&libraries=geometry">
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD8CBYhq7f2aibteBvLz2jvRZAHu346qJM&libraries=geometry">
     </script>
     <!--publish key = AIzaSyCAaPv-EB14exrrWjKO3RDzUpFLYqjnlvg-->
     <script src="bundle.js">

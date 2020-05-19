@@ -1651,7 +1651,7 @@ var counter_sensor_0 = 0;
                 w = document.getElementById("power-meter"),
                 b = document.getElementById("hr-meter"),
                 E = document.getElementById("cadence-meter"),
-                S = document.getElementById("menuopen-btn"),
+                //S = document.getElementById("menuopen-btn"),
                 x = document.getElementById("btn-fullscreen"),
                 T = document.getElementById("bluetooth-device-container"),
                 k = document.getElementById("ant-device-container"),
@@ -1682,8 +1682,8 @@ var counter_sensor_0 = 0;
                     (document.getElementById("rider-weight-label").innerHTML = "Rider Weight (kg)",
                         document.getElementById("rider-weight").setAttribute("placeholder", 85))
             },
-                //menuopen-btn
-                S.onclick = t => { t.preventDefault(), "none" === document.getElementById("ui-finalize-container").style.display ? a.showFinalizeUI("Complete Ride") : document.getElementById("ui-finalize-container").style.display = "none" },
+                ////menuopen-btn
+                //S.onclick = t => { t.preventDefault(), "none" === document.getElementById("ui-finalize-container").style.display ? a.showFinalizeUI("Complete Ride") : document.getElementById("ui-finalize-container").style.display = "none" },
                 //btn-fullscreen
                 x.onclick = t => {
                     t.preventDefault(),
@@ -1711,7 +1711,7 @@ var counter_sensor_0 = 0;
                             void (document.getElementById("btn-bluetooth-device-warning").style.display = "block");
                     y.classList.contains("disabled") || (y.classList.add("disabled"), g.innerHTML = "Connecting ...",
                         async function () {
-                        //HeartRate = 6157 CyclingPower = 6168 CyclingSpeedAndCadence = 6166
+                            //HeartRate = 6157 CyclingPower = 6168 CyclingSpeedAndCadence = 6166
                             let t,
                                 e = await navigator.bluetooth.requestDevice({ filters: [{ services: [6157] }, { services: [6168] }, { services: [6166] }] }),
                                 n = await e.gatt.connect();
@@ -1762,10 +1762,10 @@ var counter_sensor_0 = 0;
                             document.getElementById("waitring").style.display = "none";
                             //begin knop terug werkzaam maken
                             document.getElementById("begin-session").disabled = false;
-                        document.getElementById("begin-session").style.backgroundColor = "green";
-                        //simulate button begin-session (p.onclick funktie) als toch alles in orde is wil ik niet wachten totdat je op de knop
-                        //begin-session klikt maar gaan dan verder met het scherm van google street view
-                        document.getElementById("begin-session").click();
+                            document.getElementById("begin-session").style.backgroundColor = "green";
+                            //simulate button begin-session (p.onclick funktie) als toch alles in orde is wil ik niet wachten totdat je op de knop
+                            //begin-session klikt maar gaan dan verder met het scherm van google street view
+                            document.getElementById("begin-session").click();
                         }().catch(t => {
                             y.classList.remove("disabled"),
                                 g.innerHTML = "Connect",
@@ -2840,10 +2840,7 @@ var counter_sensor_0 = 0;
                     let e = new Date, n = (e - this.ridingState.lastSampleTime) / 1e3; this.ridingState.lastSampleTime = e;
                     let r = 1, o = 0, a = 0;
                     for (; 0 < r;) {
-                        let t = this.speedFromPower(
-                            this.ridingState.watts,
-                            this.ridingState.point.smoothedGrade,
-                            this.ridingState.point.elevation),
+                        let t = this.speedFromPower(this.ridingState.watts, this.ridingState.point.smoothedGrade, this.ridingState.point.elevation),
                             e = this.ridingState.speed + .2 * (t - this.ridingState.speed);
                         .447 > e && (e = 0);
                         let i = e * n * r, s = this.ridingState.point.distance - this.ridingState.point.distance * this.ridingState.pointPct;
@@ -2881,7 +2878,20 @@ var counter_sensor_0 = 0;
                         let t = this.miniMap.getStreetView();
                         // bijgevoegd om onmiddelijk te stoppen als het vermogen = 0, anders loop je nog eventjes verder
                         if (this.ridingState.watts > 0) {
-                            this.ridingState.speed = o / n, 0 < this.ridingState.speed && (this.ridingState.elapsed += n);
+                            //bijgevoegd als een cadence sensor wordt gebruikt dan is het fietsvermogen constant 50 watt
+                            //en de snelheid is een 10de van het vermogen = 5 komt overeen met een fietssnelheid van 18 km / h
+                            if (this.ridingState.rpm >= 0) {
+                                this.ridingState.speed = this.ridingState.watts/10;
+                            }
+                            //indien een speedsensor wordt gebruikt dan is het vermogen afhankelijk van de rotatie van de sensor en afhankelijk
+                            //van de stijlheid vd plaats vd weg opdat moment
+                            else {
+                                this.ridingState.speed = o / n, 0 < this.ridingState.speed && (this.ridingState.elapsed += n);
+                                // maak onderstaande containers zichtbaar daar deze bij een speedsensor deze nuittig zijn
+                                //omdat de snelheid afhankelijk is van het vermogen en de helling van de weg
+                                document.getElementById("ui-elevation-container").style.display = "block";
+                                document.getElementById("ui-heightmap-container").style.display = "block";
+                            }
                         }
                         else {
                             this.ridingState.speed = 0;
@@ -2909,13 +2919,20 @@ var counter_sensor_0 = 0;
                                 this.fullMap.panTo(this.ridingState.location),
                                 this.fullMarker.setPosition(this.ridingState.location)
                         }
-                    } 0 == t % 30 && Promise.resolve().then(() => { ti.set(this.cacheName(), this) }), this.updateGraphs(), t += 1, await s(1e3)
+                    } 0 == t % 30 && Promise.resolve().then(() => {
+                        ti.set(this.cacheName(), this)
+                    }), this.updateGraphs(), t += 1, await s(1e3)
                 } this.routeCompleted = !0
             }
             speedFromPower(t, e, n) {
                 let i = 1e3 * Yt(-n / 7e3),
                     r = function (t, e) {
-                        var n = -1e3, i = 1e3, r = 0, s = c(r, e), o = 0; do { if (ce(s - t) < 1e-6) break; s > t ? i = r : n = r, s = c(r = (i + n) / 2, e) }
+                        var n = -1e3,
+                            i = 1e3,
+                            r = 0,
+                            s = c(r, e),
+                            o = 0;
+                        do { if (ce(s - t) < 1e-6) break; s > t ? i = r : n = r, s = c(r = (i + n) / 2, e) }
                         while (100 > o++);
                         return r
                     }(t, {
@@ -2932,7 +2949,7 @@ var counter_sensor_0 = 0;
                 return r *= .277778
             }
             // continu bijwerken van google streetview scherm
-            async updateUI() {               
+            async updateUI() {
                 for (; !this.routeCompleted;) {
                     let t = this.ridingState.elapsed.toFixed(), e = ie(t / 3600), n = ie((t - 3600 * e) / 60), i = t - 3600 * e - 60 * n; 10 > n && (n = "0" + n), 10 > i && (i = "0" + i);
                     let r = 0 === e ? n + ":" + i : e + ":" + n + ":" + i, o = this.ridingState.distance * ("imperial" === this.unit ? 621371e-9 : .001); o = 100 < o ? o.toFixed() : o.toFixed(1);
@@ -2943,7 +2960,7 @@ var counter_sensor_0 = 0;
                     let u = this.ridingState.bpm; u = null != u ? u.toFixed() : "--";
                     //indien geen cadence sensor maar een speed sensor is operationeel dan is ridingState.rpm = undifined en wordt er geen rekening gehouden met de waarde van fixpower_cadence
                     if (this.ridingState.rpm >= 0) { this.ridingState.watts = fixpower_cadence; };
-                    let h = this.ridingState.rpm; h = null != h ? h.toFixed() : "--",                        
+                    let h = this.ridingState.rpm; h = null != h ? h.toFixed() : "--",
                         document.getElementById("watts").innerHTML = l,
                         document.getElementById("heart").innerHTML = u,
                         document.getElementById("cadence").innerHTML = h,
@@ -3080,7 +3097,7 @@ var counter_sensor_0 = 0;
         }
         class gi extends pi { constructor() { super(), this.fields = di, this.mask_size = 8 } }
         class mi extends pi { constructor() { super(), this.fields = hi, this.mask_size = 16 } }
-          //vi child class of another class
+        //vi child class of another class
         class vi {
             constructor() {
                 this.listeners = {}, this.timeoutID = void 0, this.milliTimeout = 8e3
@@ -3176,7 +3193,7 @@ var counter_sensor_0 = 0;
                     this.listening = !0)
             }
         }
-                //yi is a child class of bi
+        //yi is a child class of bi
         class bi extends yi {
             constructor(t, e, n, i) {
                 super(t, e, n, i),
@@ -3189,7 +3206,7 @@ var counter_sensor_0 = 0;
                     this.lastWheelTime = 0
             }
             listen() {
-           
+
                 this.listening || (this.characteristic.addEventListener("characteristicvaluechanged", t => {
                     let e = this.parser.getData(t.target.value),
                         n = e.cumulative_crank_revolutions,
